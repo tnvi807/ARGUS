@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGUS â€” Audit Log</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">
+      <div class="eye">&#128065;</div>
+      <div><h1>AR<span>GUS</span></h1><p>Agent Role &amp; Graph Unified Sentinel</p></div>
+    </div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="mvp-mini"><span class="dot"></span> <b>MVP: 6/6 features live</b></div>
+      <div style="margin-top:6px">Feature 6 â€” Audit Log</div>
+      <div style="margin-top:8px;color:#3d516b">Append-only Â· exportable Â· compliance-ready</div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <h2 id="viewTitle">Audit Log</h2>
+      <span class="crumb" id="viewCrumb"></span>
+      <div class="spacer"></div>
+      <div class="threat" id="threatBox"><span class="pulse"></span><span id="threatText">THREAT LEVEL: LOW</span></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <label class="toggle"><input type="checkbox" id="autopilot" checked><span class="track"></span> Autopilot</label>
+    </header>
+    <div id="toasts"></div>
+    <div class="viewport">
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+        <input type="text" id="auditSearch" placeholder="Search audit log... (agent, action, decision)" oninput="renderAudit()" style="flex:1;min-width:220px;background:#0a1220;border:1px solid #24354f;border-radius:8px;color:var(--text);padding:8px 12px;font-family:inherit;font-size:12.5px;outline:none">
+        <button class="btn" onclick="exportAudit('json')">&#11015; Export JSON</button>
+        <button class="btn" onclick="exportAudit('csv')">&#11015; Export CSV</button>
+        <button class="btn danger sm" onclick="if(confirm('Wipe all ARGUS state and reseed?')){resetState();location.reload()}">Reset demo data</button>
+        <span style="font-size:11.5px;color:var(--dim)" id="auditCount"></span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Time</th><th>Agent</th><th>Action</th><th>Target</th><th>Decision</th><th>Score</th><th>Reason</th></tr></thead>
+          <tbody id="auditBody"></tbody>
+        </table>
+      </div>
+      <p class="hint">The audit log is append-only: what happened, when, the decision taken, and whether the action was allowed or blocked. Export it for compliance (SOC&nbsp;2, ISO&nbsp;27001, EU&nbsp;AI&nbsp;Act).</p>
+    </div>
+  </main>
+</div>
+<script src="../js/store.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sim.js"></script>
+<script src="../js/page-audit.js"></script>
+</body>
+</html>

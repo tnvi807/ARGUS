@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGUS â€” Agent Registry</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">
+      <div class="eye">&#128065;</div>
+      <div><h1>AR<span>GUS</span></h1><p>Agent Role &amp; Graph Unified Sentinel</p></div>
+    </div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="mvp-mini"><span class="dot"></span> <b>MVP: 6/6 features live</b></div>
+      <div style="margin-top:6px">Feature 1 â€” Agent Role Registry</div>
+      <div style="margin-top:8px;color:#3d516b">Every agent gets a defined role</div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <h2 id="viewTitle">Agent Registry</h2>
+      <span class="crumb" id="viewCrumb"></span>
+      <div class="spacer"></div>
+      <div class="threat" id="threatBox"><span class="pulse"></span><span id="threatText">THREAT LEVEL: LOW</span></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <label class="toggle"><input type="checkbox" id="autopilot" checked><span class="track"></span> Autopilot</label>
+    </header>
+    <div id="toasts"></div>
+    <div class="viewport">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="flex:1;color:var(--muted);font-size:12.5px">Every agent gets a defined role, permitted tools, allowed data, and restricted actions. Anything outside its job description &mdash; ARGUS stops it.</div>
+        <button class="btn primary" onclick="openNewAgent()">+ Register Agent</button>
+      </div>
+      <div class="grid g3" id="agentGrid"></div>
+      <div class="section-title">Role template library &mdash; one-click least-privilege policies</div>
+      <div class="grid g4" id="roleTemplates"></div>
+    </div>
+  </main>
+</div>
+<script src="../js/store.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sim.js"></script>
+<script src="../js/page-agents.js"></script>
+</body>
+</html>

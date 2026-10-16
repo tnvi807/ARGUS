@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGUS â€” Live Activity</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">
+      <div class="eye">&#128065;</div>
+      <div><h1>AR<span>GUS</span></h1><p>Agent Role &amp; Graph Unified Sentinel</p></div>
+    </div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="mvp-mini"><span class="dot"></span> <b>MVP: 6/6 features live</b></div>
+      <div style="margin-top:6px">Feature 2 â€” Live Activity Monitoring</div>
+      <div style="margin-top:8px;color:#3d516b">Every action, every millisecond</div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <h2 id="viewTitle">Live Activity</h2>
+      <span class="crumb" id="viewCrumb"></span>
+      <div class="spacer"></div>
+      <div class="threat" id="threatBox"><span class="pulse"></span><span id="threatText">THREAT LEVEL: LOW</span></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <label class="toggle"><input type="checkbox" id="autopilot" checked><span class="track"></span> Autopilot</label>
+    </header>
+    <div id="toasts"></div>
+    <div class="viewport">
+      <div class="pill-tabs">
+        <button class="btn active-sel" onclick="setFeedFilter('all',this)">All</button>
+        <button class="btn" onclick="setFeedFilter('ALLOWED',this)">Allowed</button>
+        <button class="btn" onclick="setFeedFilter('FLAGGED',this)">Flagged</button>
+        <button class="btn" onclick="setFeedFilter('BLOCKED',this)">Blocked</button>
+        <div class="spacer"></div>
+        <a class="btn amber" href="live.html?demo=role">&#128274; Demo: role violation</a>
+        <a class="btn amber" href="live.html?demo=tool">&#128309; Demo: rogue tool</a>
+        <span style="font-size:11.5px;color:var(--dim);align-self:center" id="liveCount"></span>
+      </div>
+      <div class="card" style="padding:12px">
+        <div class="feed" id="liveFeed" style="max-height:calc(100vh - 210px)"></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/store.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sim.js"></script>
+<script src="../js/page-live.js"></script>
+</body>
+</html>

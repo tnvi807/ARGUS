@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGUS â€” Overview</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">
+      <div class="eye">&#128065;</div>
+      <div><h1>AR<span>GUS</span></h1><p>Agent Role &amp; Graph Unified Sentinel</p></div>
+    </div></div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <div class="mvp-mini"><span class="dot"></span> <b>MVP: 6/6 features live</b></div>
+      <div style="margin-top:6px">Role Registry Â· Live Monitor Â· Drift Engine Â· Risk Score Â· Containment Â· Audit</div>
+      <div style="margin-top:8px;color:#3d516b">Hackathon build Â· multi-page demo</div>
+    </div>
+  </aside>
+  <main>
+    <header class="topbar">
+      <h2 id="viewTitle">Overview</h2>
+      <span class="crumb" id="viewCrumb"></span>
+      <div class="spacer"></div>
+      <div class="threat" id="threatBox"><span class="pulse"></span><span id="threatText">THREAT LEVEL: LOW</span></div>
+      <div class="clock" id="clock">--:--:--</div>
+      <label class="toggle"><input type="checkbox" id="autopilot" checked><span class="track"></span> Autopilot</label>
+    </header>
+    <div id="toasts"></div>
+    <div class="viewport">
+
+      <div class="grid g5" style="margin-bottom:14px">
+        <div class="stat"><div class="lab">Agents Monitored</div><div class="val" id="stAgents">0</div><div class="sub" id="stAgentsSub"></div></div>
+        <div class="stat green"><div class="lab">Actions / session</div><div class="val" id="stActions">0</div><div class="sub">evaluated in real time</div></div>
+        <div class="stat red"><div class="lab">Blocked Today</div><div class="val" id="stBlocked">0</div><div class="sub">threats stopped pre-damage</div></div>
+        <div class="stat amber"><div class="lab">Open Alerts</div><div class="val" id="stAlerts">0</div><div class="sub">explainable, scored 0&ndash;100</div></div>
+        <div class="stat purple"><div class="lab">Avg Risk Score</div><div class="val" id="stRisk">0</div><div class="sub">across all decisions</div></div>
+      </div>
+
+      <div class="grid g21" style="margin-bottom:14px">
+        <div class="card">
+          <h3>&#9889; Live Decision Feed <span class="r"><a class="btn sm" href="live.html">Open full feed &rarr;</a></span></h3>
+          <div class="feed" id="dashFeed"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div class="card" style="flex:1">
+            <h3>&#128737; Attack Kill-Chain Map</h3>
+            <div id="killchain"></div>
+            <p class="hint">Every blocked/flagged action is mapped to an attack stage &mdash; so you can see <i>where</i> intruders are probing.</p>
+          </div>
+          <div class="card">
+            <h3>&#128161; Run an Attack Demo</h3>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <a class="btn danger sm" href="live.html?demo=role">&#128274; 1&middot; Role violation (HR file theft)</a>
+              <a class="btn danger sm" href="graph.html?demo=chain">&#128279; 2&middot; Suspicious agent-to-agent chain</a>
+              <a class="btn danger sm" href="drift.html?demo=drift">&#128200; 3&middot; Slow drift &mdash; the 7-day sneak</a>
+              <a class="btn danger sm" href="live.html?demo=tool">&#128309; 4&middot; Rogue tool / data exfiltration</a>
+              <a class="btn danger sm" href="alerts.html?demo=priv">&#9888; 5&middot; Privilege escalation attempt</a>
+            </div>
+            <p class="hint">Each demo replays a realistic future-world attack on the right page. ARGUS evaluates, scores, explains, and contains it.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>&#129302; Agent Risk Board <span class="r"><a class="btn sm" href="agents.html">Manage registry &rarr;</a></span></h3>
+        <div class="grid g3" id="riskBoard"></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../js/store.js"></script>
+<script src="../js/ui.js"></script>
+<script src="../js/sim.js"></script>
+<script src="../js/page-dashboard.js"></script>
+</body>
+</html>
