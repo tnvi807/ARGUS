@@ -47,7 +47,24 @@ paused, isolated, and restored; every decision lands in an append-only audit led
 
 ## Quick start
 
-### Docker Compose (recommended)
+### Hackathon demo (one command, one URL, no Docker)
+
+```bat
+cd argus-sentinel
+start-demo.bat
+```
+
+Builds the React UI, embeds it in the Spring Boot backend, starts the server
+(in-memory H2, ambient autopilot traffic ON) and opens **http://localhost:8080** —
+the API and the UI share one origin, so every screen shows live data from the database.
+
+- UI: http://localhost:8080
+- API + Swagger: http://localhost:8080/swagger-ui.html
+- Health: http://localhost:8080/actuator/health
+
+Do not open `pages/index.html` — that is the old static prototype with hardcoded data.
+
+### Docker Compose
 
 ```bash
 cd argus-sentinel

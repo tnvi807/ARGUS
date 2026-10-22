@@ -313,7 +313,22 @@ export async function graph(): Promise<GraphData> {
 }
 
 export async function blast(from: string): Promise<BlastRadius> {
-  return request<BlastRadius>(`/api/graph/blast${qs({ from })}`)
+  const body = await request<BlastRadius | { error: string }>(`/api/graph/blast${qs({ from })}`)
+  if (body && typeof body === 'object' && 'error' in body) {
+    throw new ApiRequestError(404, null, (body as { error: string }).error)
+  }
+  return body as BlastRadius
+}
+
+export async function simStatus(): Promise<{ autopilot: boolean }> {
+  return request<{ autopilot: boolean }>('/api/sim/status')
+}
+
+export async function setAutopilot(enabled: boolean): Promise<{ autopilot: boolean }> {
+  return request<{ autopilot: boolean }>('/api/sim/autopilot', {
+    method: 'POST',
+    body: JSON.stringify({ enabled }),
+  })
 }
 
 export async function evidenceList(): Promise<UploadedFile[]> {

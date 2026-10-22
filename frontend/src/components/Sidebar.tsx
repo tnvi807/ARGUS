@@ -16,6 +16,7 @@ const NAV: NavItem[] = [
   { to: '/approvals', label: 'Approvals', permission: 'approvals.read', badgeKey: 'approvals' },
   { to: '/alerts', label: 'Alerts', permission: 'alerts.read', badgeKey: 'alerts' },
   { to: '/audit', label: 'Audit Trail', permission: 'audit.read' },
+  { to: '/evidence', label: 'Evidence', permission: 'evidence.read' },
   { to: '/analysis', label: 'Analysis', permission: 'analysis.create' },
   { to: '/demo', label: 'Demo Lab', permission: 'dashboard.read' },
   { to: '/admin', label: 'Administration', permission: 'admin.manage' },

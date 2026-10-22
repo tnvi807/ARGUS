@@ -11,6 +11,7 @@ import { Approvals } from './pages/Approvals'
 import { Audit } from './pages/Audit'
 import { Dashboard } from './pages/Dashboard'
 import { DemoLab } from './pages/DemoLab'
+import { Evidence } from './pages/Evidence'
 import { Feed } from './pages/Feed'
 import { Graph } from './pages/Graph'
 import { Login } from './pages/Login'
@@ -85,6 +86,14 @@ export default function App() {
                   element={
                     <RequirePermission code="audit.read">
                       <Audit />
+                    </RequirePermission>
+                  }
+                />
+                <Route
+                  path="evidence"
+                  element={
+                    <RequirePermission code="evidence.read">
+                      <Evidence />
                     </RequirePermission>
                   }
                 />

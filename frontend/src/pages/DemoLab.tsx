@@ -152,8 +152,10 @@ export function DemoLab() {
   const canRun = hasPermission('demos.run')
   const canSubmit = hasPermission('actions.submit')
   const canSeeEvents = hasPermission('events.read')
+  const canControlSim = hasPermission('sim.control')
   const [demos, setDemos] = useState<Record<string, DemoCatalogEntry>>({})
   const [running, setRunning] = useState(false)
+  const [autopilot, setAutopilotState] = useState<boolean | null>(null)
   const [catalog, setCatalog] = useState<PolicyCatalog | null>(null)
   const [agentsList, setAgentsList] = useState<AgentSummary[]>([])
   const [mirror, setMirror] = useState<FeedEvent[]>([])
@@ -171,14 +173,16 @@ export function DemoLab() {
       api.policyCatalog().catch(() => null),
       api.agents().catch(() => [] as AgentSummary[]),
       canSeeEvents ? api.feed(undefined, undefined, 20).catch(() => [] as FeedEvent[]) : Promise.resolve([] as FeedEvent[]),
+      api.simStatus().catch(() => ({ autopilot: false })),
     ])
-      .then(([d, c, a, f]) => {
+      .then(([d, c, a, f, s]) => {
         if (cancelled) return
         setDemos(d.demos)
         setRunning(d.running)
         setCatalog(c)
         setAgentsList(a)
         setMirror(f)
+        setAutopilotState(s.autopilot)
         setError(null)
       })
       .catch((err) => {
@@ -224,6 +228,16 @@ export function DemoLab() {
     }
   }
 
+  const toggleAutopilot = async () => {
+    try {
+      const res = await api.setAutopilot(!(autopilot ?? false))
+      setAutopilotState(res.autopilot)
+      toast.success(`Ambient autopilot ${res.autopilot ? 'enabled' : 'disabled'}`)
+    } catch (err) {
+      toast.error(apiErrorMessage(err))
+    }
+  }
+
   const doReset = async () => {
     setResetBusy(true)
     try {
@@ -250,15 +264,31 @@ export function DemoLab() {
         title="Demo Lab"
         description="Scripted attack simulations executed against the live gateway pipeline"
         actions={
-          canRun ? (
-            <button
-              type="button"
-              onClick={() => setConfirmReset(true)}
-              className="rounded-md border border-danger/40 px-3 py-1.5 text-sm text-danger hover:bg-danger/10"
-            >
-              Reset demo data
-            </button>
-          ) : null
+          <div className="flex items-center gap-2">
+            {canControlSim && autopilot !== null && (
+              <button
+                type="button"
+                onClick={() => void toggleAutopilot()}
+                className={`rounded-md border px-3 py-1.5 text-sm font-semibold ${
+                  autopilot
+                    ? 'border-ok/50 bg-ok/10 text-ok'
+                    : 'border-edge text-dim hover:text-bright'
+                }`}
+                title="Ambient autopilot traffic keeps the live feed populated"
+              >
+                Autopilot {autopilot ? 'ON' : 'OFF'}
+              </button>
+            )}
+            {canRun ? (
+              <button
+                type="button"
+                onClick={() => setConfirmReset(true)}
+                className="rounded-md border border-danger/40 px-3 py-1.5 text-sm text-danger hover:bg-danger/10"
+              >
+                Reset demo data
+              </button>
+            ) : null}
+          </div>
         }
       />
 
