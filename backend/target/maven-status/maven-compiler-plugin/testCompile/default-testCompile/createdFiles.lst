@@ -1,0 +1,6 @@
+com\argus\DemoLabTest.class
+com\argus\BaseIntegrationTest.class
+com\argus\AnalysisTest.class
+com\argus\AuditAdminEvidenceTest.class
+com\argus\AuthRbacTest.class
+com\argus\EnforcementTest.class

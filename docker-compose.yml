@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: argus
+      POSTGRES_USER: argus
+      POSTGRES_PASSWORD: ${ARGUS_DB_PASSWORD:-argus}
+    volumes:
+      - argus-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U argus -d argus"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ARGUS_DB_URL: jdbc:postgresql://db:5432/argus
+      ARGUS_DB_USER: argus
+      ARGUS_DB_PASSWORD: ${ARGUS_DB_PASSWORD:-argus}
+      ARGUS_JWT_SECRET: ${ARGUS_JWT_SECRET:-change-me-to-a-long-random-string-at-least-32-bytes}
+      ARGUS_ADMIN_PASSWORD: ${ARGUS_ADMIN_PASSWORD:-ChangeMe!Argus2026}
+      ARGUS_ANALYST_PASSWORD: ${ARGUS_ANALYST_PASSWORD:-Analyst!Argus2026}
+      ARGUS_VIEWER_PASSWORD: ${ARGUS_VIEWER_PASSWORD:-Viewer!Argus2026}
+      ARGUS_UPLOAD_DIR: /app/data/uploads
+      ARGUS_CORS_ORIGINS: http://localhost:3000
+    volumes:
+      - argus-uploads:/app/data/uploads
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  argus-pgdata:
+  argus-uploads:

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:argus-test-${random.uuid};DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+argus:
+  security:
+    jwt-secret: test-secret-0123456789abcdefghijklmnopqrstuv
+    jwt-ttl-minutes: 60
+    admin-password: AdminTest!2026
+    analyst-password: AnalystTest!2026
+    viewer-password: ViewerTest!2026
+  upload:
+    dir: ${java.io.tmpdir}/argus-test-uploads
+  sim:
+    autopilot-enabled: false
