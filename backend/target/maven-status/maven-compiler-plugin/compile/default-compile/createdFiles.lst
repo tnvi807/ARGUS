@@ -31,6 +31,7 @@ com\argus\audit\AuditWriter.class
 com\argus\event\ActionEvent.class
 com\argus\admin\AdminUserController$UserView.class
 com\argus\catalog\DataCatalog$Category.class
+com\argus\config\SpaForwardController.class
 com\argus\containment\ContainmentController.class
 com\argus\engine\RiskEngine.class
 com\argus\containment\ContainmentAction$Kind.class

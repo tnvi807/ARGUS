@@ -16,5 +16,5 @@ USER argus
 EXPOSE 8080
 ENV ARGUS_UPLOAD_DIR=/app/data/uploads
 HEALTHCHECK --interval=15s --timeout=3s --start-period=40s --retries=5 \
-  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+  CMD bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080' || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]

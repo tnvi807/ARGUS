@@ -22,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -81,6 +82,7 @@ public class AlertController {
 
     @PostMapping("/{id}/playbook")
     @PreAuthorize("hasAuthority('" + Permissions.ALERTS_ACT + "')")
+    @Transactional
     public EventDtos.AlertView playbook(@PathVariable Long id,
                                         @Valid @RequestBody PlaybookRequest request) {
         Alert alert = alertRepository.findById(id)

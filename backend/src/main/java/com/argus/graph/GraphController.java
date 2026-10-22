@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,6 +39,7 @@ public class GraphController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('" + Permissions.AGENTS_READ + "')")
+    @Transactional(readOnly = true)
     public Map<String, Object> graph() {
         List<Agent> agents = agentRepository.findAllByOrderByIdAsc();
         List<AgentComms> comms = commsRepository.findTop60ByOrderByTsDesc();
@@ -101,6 +103,7 @@ public class GraphController {
     /** BFS attack-path prediction: which peers/tools/stores an infected agent could reach. */
     @GetMapping("/blast")
     @PreAuthorize("hasAuthority('" + Permissions.AGENTS_READ + "')")
+    @Transactional(readOnly = true)
     public Map<String, Object> blast(@RequestParam(name = "from") String fromId) {
         List<Agent> agents = agentRepository.findAllByOrderByIdAsc();
         Map<String, Agent> byId = new LinkedHashMap<>();

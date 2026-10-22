@@ -33,6 +33,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  *
  * <ul>
  *   <li>Everything under {@code /api/**} requires a valid bearer token except login and health.</li>
+ *   <li>The static SPA shell (HTML/JS/CSS assets) is public so the UI can load before login.</li>
  *   <li>Role/permission checks are enforced per method via {@code @PreAuthorize} (least privilege).</li>
  *   <li>401/403 are returned as structured JSON, never as an HTML error page or stack trace.</li>
  * </ul>
@@ -74,7 +75,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/actuator/health", "/actuator/info",
                                 "/error", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/api/admin/**").hasAuthority(Permissions.ADMIN_MANAGE)
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(jwtService.decoder())
                                 .jwtAuthenticationConverter(new ArgusJwtAuthenticationConverter(jwtService)))

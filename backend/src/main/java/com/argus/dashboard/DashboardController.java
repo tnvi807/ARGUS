@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +49,7 @@ public class DashboardController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('" + Permissions.DASHBOARD_READ + "')")
+    @Transactional(readOnly = true)
     public Map<String, Object> summary() {
         Instant now = Instant.now();
         Instant dayAgo = now.minus(Duration.ofHours(24));
