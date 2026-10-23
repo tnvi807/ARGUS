@@ -4,7 +4,9 @@ Real-time AI-agent security gateway. Every action an autonomous agent attempts f
 through ARGUS, which scores risk (0–100), explains the decision, and enforces it:
 **ALLOWED** (execute), **RESTRICTED** (execute with redacted output), **PENDING_APPROVAL**
 (hold for an administrator), or **BLOCKED** (no side effects). Contained agents can be
-paused, isolated, and restored; every decision lands in an append-only audit ledger.
+paused, isolated, and restored; every decision lands in an audit ledger that is
+append-only, enforced by the app layer and a DB trigger (see
+[Audit ledger](#audit-ledger-append-only)).
 
 > This repository also contains the original static prototype, now moved into
 > `prototype/` (`prototype/css/`, `prototype/js/`, `prototype/pages/`,
@@ -30,7 +32,7 @@ paused, isolated, and restored; every decision lands in an append-only audit led
 4. **Enforcement pipeline** — deterministic risk engine (sensitivity, policy, drift, containment, rate, keyword factors) with proven no-side-effects for held/blocked actions.
 5. **Approval queue** — PENDING_APPROVAL actions execute only after an explicit, audited admin decision.
 6. **Alerts & containment** — playbook actions (block resource, pause/resume, revoke tool, mark reviewed) + containment history.
-7. **Append-only audit trail** — search + JSON/CSV export; DB-level append-only enforcement.
+7. **Append-only audit trail** — search + JSON/CSV export; append-only enforced by the app layer and a DB trigger.
 8. **Prompt & PDF analysis** — 12 indicator families (injection, bypass, exfiltration, hidden content, …), gateway preview, history.
 9. **Trust graph** — agent nodes, communication edges, suspicious chains, blast-radius BFS.
 10. **Demo lab** — 9 scripted scenarios (normal procurement, malicious PDF, rogue tool, identity drift, …) + manual gateway submission form.
@@ -132,7 +134,8 @@ ARGUS/
 │       ├── event/ alerts/ approval/ audit/ evidence/
 │       ├── demo/ stream/ feed/ graph/ dashboard/
 │       └── seed/                      # permissions, roles, users, demo agents
-│   └── src/main/resources/db/migration/V1__init.sql
+│   ├── src/main/resources/db/migration/V1__init.sql
+│   └── src/main/resources/db/migration-postgres/V2__audit_append_only_trigger.sql
 ├── frontend/                 # React 19 SPA (12 routes, SSE live views, SVG charts)
 ├── docs/FRONTEND_SPEC.md     # API contract + UI specification
 ├── prototype/                # legacy static prototype (css/ js/ pages/ index.html)
@@ -161,7 +164,29 @@ Full request/response shapes: `docs/FRONTEND_SPEC.md` and live OpenAPI at
 enforcement guarantees (blocked/held actions provably have no side effects, approvals
 execute, isolated agents are refused), analysis engines, audit append-only + evidence
 validation, and the demo lab. Tests run on ephemeral H2 (`MODE=PostgreSQL`) with Flyway
-migrations and `ddl-auto: validate` — the schema is owned by `V1__init.sql`.
+migrations and `ddl-auto: validate` — the schema is owned by `V1__init.sql`; the
+PostgreSQL-only V2 trigger migration is skipped on H2 (see
+[Audit ledger](#audit-ledger-append-only)).
+
+## Audit ledger (append-only)
+
+The audit ledger is **append-only, enforced by the app layer and a DB trigger** — nothing
+more is claimed:
+
+- **App layer:** `AuditEntry` refuses UPDATE at the JPA level (`@PreUpdate` throws), and
+  the only write path is `AuditWriter.record(...)` (inserts).
+- **DB trigger (PostgreSQL):** Flyway `V2` creates a `BEFORE UPDATE OR DELETE` trigger on
+  `audit_entries` that raises an exception, so a direct SQL client cannot modify or remove
+  rows.
+- **H2 caveat:** H2 (the `local` profile and the test suite, both `MODE=PostgreSQL`) cannot
+  run PL/pgSQL triggers, so those profiles fly only `classpath:db/migration` and skip V2 —
+  on H2 the guarantee stops at the app layer.
+- **Not claimed:** hash chaining / tamper-proofing against database administrators or
+  superusers, TRUNCATE protection, or any guarantee stronger than "app layer + trigger".
+- **Known limit on PostgreSQL:** the in-app retention trim (`AuditWriter` deletes the oldest
+  rows once the ledger passes `argus.feed.max-events * 2`, i.e. 800) trips the trigger and
+  makes that write fail with an error until retention is handled outside the application.
+  Short runs (demo, tests) stay below that threshold.
 
 ## Security notes
 
@@ -169,5 +194,6 @@ migrations and `ddl-auto: validate` — the schema is owned by `V1__init.sql`.
 - JWTs are short-lived, stateless, and revocable via token version — no server sessions.
 - Failed logins are generic ("Invalid username or password"); lockout after 5 attempts.
 - Evidence/PDF uploads are extension-allow-listed, size-capped, content-sniffed, and hashed.
-- The audit ledger rejects UPDATE/DELETE at the JPA event-listener level.
+- The audit ledger is **append-only, enforced by the app layer and a DB trigger** — see
+  [Audit ledger](#audit-ledger-append-only) for exactly what is and is not guaranteed.
 - CORS origins are configurable (`ARGUS_CORS_ORIGINS`).

@@ -1,4 +1,8 @@
 spring:
+  # H2 (MODE=PostgreSQL) cannot run the PL/pgSQL append-only trigger, so the
+  # PostgreSQL-only V2 migration is skipped: tests exercise the app-layer guard.
+  flyway:
+    locations: classpath:db/migration
   datasource:
     url: jdbc:h2:mem:argus-test-${random.uuid};DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
     driver-class-name: org.h2.Driver

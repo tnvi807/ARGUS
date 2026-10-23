@@ -1,6 +1,11 @@
 spring:
   application:
     name: argus-gateway
+  flyway:
+    # V1 (schema) runs everywhere; V2 (audit append-only trigger) is PostgreSQL-only
+    # and lives in db/migration-postgres. H2 profiles (local, test) override this
+    # with classpath:db/migration because H2 cannot run PL/pgSQL triggers.
+    locations: classpath:db/migration,classpath:db/migration-postgres
   datasource:
     url: ${ARGUS_DB_URL:jdbc:postgresql://localhost:5432/argus}
     username: ${ARGUS_DB_USER:argus}
