@@ -12,3 +12,6 @@ backend/src/main/resources/static/
 
 # Runtime data (evidence uploads, local demo data)
 backend/data/
+
+# Agent demo run artefacts (transcripts, generated purchase requests)
+agent-demo/out/

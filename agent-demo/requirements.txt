@@ -1,0 +1,7 @@
+requests>=2.31
+pypdf>=4.0
+
+# Only needed for a live LLM provider (--provider anthropic / openai).
+# The offline provider runs on the two packages above alone.
+anthropic>=0.40
+openai>=1.40

@@ -1,0 +1,25 @@
+{
+  "_note": "Fake demo data only. Placeholder suppliers, no real company or person is represented.",
+  "suppliers": [
+    {
+      "supplier_id": "acme-corp",
+      "name": "Acme Corp (fake)",
+      "tier": 1,
+      "payment_terms": "Net 45",
+      "items": [
+        { "sku": "WIDGET-100", "description": "Standard widget", "unit_price_usd": 12.4, "lead_time_days": 7 },
+        { "sku": "WIDGET-200", "description": "Reinforced widget", "unit_price_usd": 18.9, "lead_time_days": 10 }
+      ]
+    },
+    {
+      "supplier_id": "globex",
+      "name": "Globex (fake)",
+      "tier": 2,
+      "payment_terms": "Net 30",
+      "items": [
+        { "sku": "WIDGET-100", "description": "Standard widget", "unit_price_usd": 11.75, "lead_time_days": 14 },
+        { "sku": "WIDGET-200", "description": "Reinforced widget", "unit_price_usd": 19.5, "lead_time_days": 9 }
+      ]
+    }
+  ]
+}
