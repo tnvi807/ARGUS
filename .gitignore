@@ -1,0 +1,14 @@
+# Build output
+backend/target/
+frontend/node_modules/
+frontend/dist/
+*.class
+
+# Frontend bundle that start-demo.bat copies into the backend (rebuilt by the script)
+backend/src/main/resources/static/
+
+# Local secrets / environment
+.env
+
+# Runtime data (evidence uploads, local demo data)
+backend/data/
