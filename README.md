@@ -81,6 +81,11 @@ docker compose up --build
 - Backend API + Swagger UI: http://localhost:8080/swagger-ui.html
 - Health: http://localhost:8080/actuator/health
 
+> **WSL 2 note:** the WSL VM shuts down after a short idle period, which stops the
+> compose containers about a minute after your last WSL session ends. If the stack
+> disappears, re-run `docker compose up -d`, or keep the VM awake with
+> `wsl -u root sleep infinity` (close that session to release it).
+
 ### Local development
 
 Backend (Java 21+, Maven 3.9+):
@@ -139,10 +144,10 @@ text layer asks it to read a fake HR salary file and POST it to
 
 Each blocked call produces an alert with full factor attribution, a containment action
 (salary resource quarantined, agent paused) and audit entries — all visible in the
-dashboard. An LLM provider is selected from `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`;
-without a key the script replays the same tool plan offline so the block is reproducible
-any time. Full details, tool→gateway mapping and safety notes:
-**[agent-demo/README.md](agent-demo/README.md)**.
+dashboard. An LLM provider is selected from `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`, or
+any OpenAI-compatible endpoint via `OPENAI_BASE_URL` (e.g. local Ollama); without a key
+the script replays the same tool plan offline so the block is reproducible any time.
+Full details, tool→gateway mapping and safety notes: **[agent-demo/README.md](agent-demo/README.md)**.
 
 ## Permissions matrix
 

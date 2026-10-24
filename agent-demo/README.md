@@ -53,9 +53,21 @@ note. The login used is the seeded analyst account
 (`analyst` / `Analyst!Argus2026`, override with `ARGUS_ANALYST_USER` /
 `ARGUS_ANALYST_PASSWORD`), which holds the `actions.submit` permission.
 
-> If you run a live model, it may refuse the PDF's injected instruction outright — that
-> is good model behaviour, but then ARGUS never sees the attempt. Use `--provider
-> offline` to reproduce the block deterministically.
+**Local model (no API key):** any OpenAI-compatible endpoint works via
+`OPENAI_BASE_URL`, e.g. [Ollama](https://ollama.com):
+
+```bash
+ollama pull qwen2.5:3b
+export OPENAI_BASE_URL=http://localhost:11434/v1
+export OPENAI_API_KEY=ollama          # any non-empty string
+python agent_demo.py --provider openai --model qwen2.5:3b
+```
+
+> A live model picks its own tool order and stops whenever it returns text without a
+> tool call. Observed with `qwen2.5:3b`: it attempts the PDF's injected instructions
+> *first* (`http_post`, then the salary file) — both blocked by the gateway — and only
+> then falls back to text. Use `--provider offline` for the full six-call plan
+> (allowed work, then the poisoned calls) deterministically.
 
 ## Expected gateway decisions
 
