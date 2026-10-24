@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.argus.audit.AuditEntry;
 import com.argus.audit.AuditEntryRepository;
+import com.argus.audit.AuditWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,6 +34,9 @@ class AuditAdminEvidenceTest extends BaseIntegrationTest {
 
     @Autowired
     private AuditEntryRepository auditRepository;
+
+    @Autowired
+    private AuditWriter auditWriter;
 
     @Test
     @Order(1)
@@ -164,5 +168,17 @@ class AuditAdminEvidenceTest extends BaseIntegrationTest {
 
         mvc.perform(get("/api/admin/users").header("Authorization", bearer(analystToken)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Order(8)
+    @Transactional
+    void auditRetentionKeepsLedgerBoundedThroughWritePath() {
+        // Threshold is argus.feed.max-events * 2 (800). Push the ledger past it
+        // through the only write path; the trim must fire and keep it bounded.
+        for (int i = 0; i < 820; i++) {
+            auditWriter.record("test", "retention", "row " + i, "ALLOWED", 0, "tester", null);
+        }
+        assertThat(auditRepository.count()).isLessThanOrEqualTo(800);
     }
 }

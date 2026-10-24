@@ -3,9 +3,12 @@ package com.argus.audit;
 import com.argus.stream.EventHub;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,13 +27,16 @@ public class AuditWriter {
     private final EventHub eventHub;
     private final ObjectMapper objectMapper;
     private final int maxEntries;
+    private final boolean postgres;
 
     public AuditWriter(AuditEntryRepository repository, EventHub eventHub, ObjectMapper objectMapper,
+                       DataSource dataSource,
                        @Value("${argus.feed.max-events:400}") int maxEntries) {
         this.repository = repository;
         this.eventHub = eventHub;
         this.objectMapper = objectMapper;
         this.maxEntries = Math.max(maxEntries * 2, 800);
+        this.postgres = isPostgres(dataSource);
     }
 
     @Transactional(propagation = Propagation.MANDATORY)
@@ -65,7 +71,22 @@ public class AuditWriter {
 
     private void trimIfNeeded() {
         if (repository.count() > maxEntries) {
-            repository.trim(maxEntries);
+            // PostgreSQL: row-level DELETE trips the V2 append-only trigger, so the
+            // trim goes through the V3 audit_trim() function (TRUNCATE-based, which
+            // the trigger does not intercept). H2 has no trigger: plain DELETE.
+            if (postgres) {
+                repository.trimOnPostgres(maxEntries);
+            } else {
+                repository.trim(maxEntries);
+            }
+        }
+    }
+
+    private static boolean isPostgres(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection()) {
+            return "PostgreSQL".equalsIgnoreCase(connection.getMetaData().getDatabaseProductName());
+        } catch (SQLException e) {
+            throw new IllegalStateException("cannot read database product name for audit retention", e);
         }
     }
 

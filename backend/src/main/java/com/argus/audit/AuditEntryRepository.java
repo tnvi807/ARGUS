@@ -31,4 +31,13 @@ public interface AuditEntryRepository extends JpaRepository<AuditEntry, Long> {
     @Query(value = "delete from audit_entries where id not in "
             + "(select id from audit_entries order by ts desc, id desc limit :keep)", nativeQuery = true)
     void trim(@Param("keep") int keep);
+
+    /**
+     * PostgreSQL retention path (V3): the append-only trigger refuses row-level
+     * DELETEs, so the trim runs as the audit_trim() database function instead
+     * (copy newest rows out, TRUNCATE, copy back - never a row-level DELETE).
+     * Returns the resulting row count.
+     */
+    @Query(value = "select audit_trim(:keep)", nativeQuery = true)
+    Integer trimOnPostgres(@Param("keep") int keep);
 }

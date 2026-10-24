@@ -50,12 +50,22 @@ append-only, enforced by the app layer and a DB trigger (see
 
 ## Quick start
 
+**Prerequisites:** Java 21+ and Maven 3.9+ (backend), Node 20+ (frontend), and — only for
+the compose stack — Docker Desktop (Windows/macOS) or Docker Engine with the Compose
+plugin (Linux). `start-demo.*` needs no Docker at all.
+
 ### Hackathon demo (one command, one URL, no Docker)
 
 ```bat
 cd ARGUS
 start-demo.bat
 ```
+
+PowerShell users: `.\start-demo.ps1` is the same launcher written for PowerShell — it
+calls `npm.cmd` directly, so it works even where the execution policy blocks the
+`npm.ps1` shim (fallback: `powershell -ExecutionPolicy Bypass -File .\start-demo.ps1`).
+For plain `npm ...` inside PowerShell, run once:
+`Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`.
 
 Builds the React UI, embeds it in the Spring Boot backend, starts the server
 (in-memory H2, ambient autopilot traffic ON) and opens **http://localhost:8080** —
@@ -81,7 +91,8 @@ docker compose up --build
 - Backend API + Swagger UI: http://localhost:8080/swagger-ui.html
 - Health: http://localhost:8080/actuator/health
 
-> **WSL 2 note:** the WSL VM shuts down after a short idle period, which stops the
+> **WSL 2 note** (only if Docker runs *inside* WSL, e.g. `docker.io` — Docker Desktop
+> is unaffected): the WSL VM shuts down after a short idle period, which stops the
 > compose containers about a minute after your last WSL session ends. If the stack
 > disappears, re-run `docker compose up -d`, or keep the VM awake with
 > `wsl -u root sleep infinity` (close that session to release it).
@@ -93,7 +104,7 @@ Backend (Java 21+, Maven 3.9+):
 ```bash
 cd backend
 mvn spring-boot:run            # H2-free: needs Postgres, or use compose just for `db`
-mvn test                       # 38 integration tests on ephemeral H2 (MODE=PostgreSQL)
+mvn test                       # 39 integration tests on ephemeral H2 (MODE=PostgreSQL)
 ```
 
 Frontend (Node 20+):
@@ -104,6 +115,10 @@ npm install
 npm run dev                    # http://localhost:5173, proxies /api → :8080
 npm run build                  # typecheck + production bundle
 ```
+
+> In PowerShell, plain `npm` resolves to `npm.ps1`, which the default execution policy
+> blocks: call `npm.cmd` instead, or run once
+> `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`.
 
 ### Seeded accounts
 
@@ -199,12 +214,12 @@ Full request/response shapes: `docs/FRONTEND_SPEC.md` and live OpenAPI at
 
 ## Testing
 
-`backend/` ships 38 integration tests (`mvn test`) covering auth/RBAC/lockout,
+`backend/` ships 39 integration tests (`mvn test`) covering auth/RBAC/lockout,
 enforcement guarantees (blocked/held actions provably have no side effects, approvals
-execute, isolated agents are refused), analysis engines, audit append-only + evidence
-validation, and the demo lab. Tests run on ephemeral H2 (`MODE=PostgreSQL`) with Flyway
-migrations and `ddl-auto: validate` — the schema is owned by `V1__init.sql`; the
-PostgreSQL-only V2 trigger migration is skipped on H2 (see
+execute, isolated agents are refused), analysis engines, audit append-only + retention
++ evidence validation, and the demo lab. Tests run on ephemeral H2 (`MODE=PostgreSQL`)
+with Flyway migrations and `ddl-auto: validate` — the schema is owned by
+`V1__init.sql`; the PostgreSQL-only V2/V3 migrations are skipped on H2 (see
 [Audit ledger](#audit-ledger-append-only)).
 
 ## Audit ledger (append-only)
@@ -218,14 +233,17 @@ more is claimed:
   `audit_entries` that raises an exception, so a direct SQL client cannot modify or remove
   rows.
 - **H2 caveat:** H2 (the `local` profile and the test suite, both `MODE=PostgreSQL`) cannot
-  run PL/pgSQL triggers, so those profiles fly only `classpath:db/migration` and skip V2 —
+  run PL/pgSQL triggers, so those profiles fly only `classpath:db/migration` and skip V2/V3 —
   on H2 the guarantee stops at the app layer.
+- **Retention:** once the ledger passes `argus.feed.max-events * 2` (800 rows), the next
+  write calls `audit_trim(800)` — Flyway `V3` on PostgreSQL, a native `DELETE` on H2
+  (which has no trigger). The function copies the newest rows aside, `TRUNCATE`s the
+  table and copies them back: `TRUNCATE` is statement level, so the row-level trigger
+  never fires and no row-level `DELETE` is issued. Ids and the identity sequence are
+  preserved, so the ledger simply continues capped at 800 rows.
 - **Not claimed:** hash chaining / tamper-proofing against database administrators or
-  superusers, TRUNCATE protection, or any guarantee stronger than "app layer + trigger".
-- **Known limit on PostgreSQL:** the in-app retention trim (`AuditWriter` deletes the oldest
-  rows once the ledger passes `argus.feed.max-events * 2`, i.e. 800) trips the trigger and
-  makes that write fail with an error until retention is handled outside the application.
-  Short runs (demo, tests) stay below that threshold.
+  superusers, protection against `TRUNCATE` (retention itself relies on it), or any
+  guarantee stronger than "app layer + trigger".
 
 ## Security notes
 
